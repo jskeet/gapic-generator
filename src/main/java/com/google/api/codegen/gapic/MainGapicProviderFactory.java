@@ -32,6 +32,7 @@ import com.google.api.codegen.py.PythonSnippetSetRunner;
 import com.google.api.codegen.rendering.CommonSnippetSetRunner;
 import com.google.api.codegen.transformer.csharp.CSharpGapicClientTransformer;
 import com.google.api.codegen.transformer.csharp.CSharpGapicSnippetsTransformer;
+import com.google.api.codegen.transformer.csharp.CSharpProjectTransformer;
 import com.google.api.codegen.transformer.go.GoGapicSurfaceTestTransformer;
 import com.google.api.codegen.transformer.go.GoGapicSurfaceTransformer;
 import com.google.api.codegen.transformer.java.JavaGapicMetadataTransformer;
@@ -138,7 +139,15 @@ public class MainGapicProviderFactory
                 .build();
         providers.add(snippetProvider);
       }
-
+      // TODO: Conditionalize?
+      GapicProvider<? extends Object> projectProvider =
+          ViewModelGapicProvider.newBuilder()
+              .setModel(model)
+              .setProductConfig(productConfig)
+              .setSnippetSetRunner(new CommonSnippetSetRunner(new CommonRenderingUtil()))
+              .setModelToViewTransformer(new CSharpProjectTransformer(packageConfig))
+              .build();
+      providers.add(projectProvider);      
     } else if (id.equals(GO)) {
       if (generatorConfig.enableSurfaceGenerator()) {
         GapicProvider<? extends Object> provider =
